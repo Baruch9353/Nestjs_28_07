@@ -8,7 +8,7 @@ export class UsersController {
 
   @Get()
   getAllUsers(): User[] {
-    return this.usersService.getAllUsers();
+    return this.usersService.findAll();
   }
 }
 
