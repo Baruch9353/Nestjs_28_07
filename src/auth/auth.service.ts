@@ -1,8 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { UsersService, User } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { hash, compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -11,26 +12,35 @@ export class AuthService {
     private usersService: UsersService
   ) {}
 
-  register(registerDto: RegisterDto) {
+  // Registers a new user with hashed password
+  async register(registerDto: RegisterDto) {
     const existingUser = this.usersService.findByUsername(registerDto.username);
     if (existingUser) {
-        throw new UnauthorizedException('Username already exists');
+      throw new UnauthorizedException('Username already exists');
     }
-    const newUser = this.usersService.addUser(registerDto);
+
+    const hashedPassword = await hash(registerDto.password, 10);
+
+    const newUser = this.usersService.addUser({
+      ...registerDto,
+      password: hashedPassword,
+    });
+
     return {
-        message: 'User registered successfully',
-        user: newUser,
+      message: 'User registered successfully',
+      user: newUser,
     };
   }
 
-
-  login(loginDto: LoginDto) {
+  // Logs in a user by verifying credentials and returns JWT token
+  async login(loginDto: LoginDto) {
     const { username, password } = loginDto;
     const user = this.usersService.findByUsername(username);
 
-    if (!user || user.password !== password) {
+    if (!user || !(await compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
+
     const token = this.generateToken(user);
 
     return {
@@ -38,7 +48,8 @@ export class AuthService {
     };
   }
 
-  private generateToken(user: any): string {
+  // Generates a JWT token for the authenticated user
+  private generateToken(user: User): string {
     const payload = {
       sub: user.id,
       username: user.username,
