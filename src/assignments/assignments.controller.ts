@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Body,  Param, UseGuards,  Request } from '@nestjs/common';
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto } from './dto/create-assignment.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -26,6 +26,7 @@ export class AssignmentsController {
 
   // Soldier can view only his assignment. Commander can view all
   @Get(':id')
+  @Roles('soldier', 'commander') 
   findOne(@Param('id') id: string, @Request() req) {
     return this.assignmentsService.findOne(+id, req.user);
   }

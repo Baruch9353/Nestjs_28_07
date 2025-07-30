@@ -1,27 +1,32 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ShiftsService } from './shifts.service';
-import { CreateShiftDto } from './dto/create-shift.dto'
+import { CreateShiftDto } from './dto/create-shift.dto';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 
-// Controller to handle shift-related routes
 @Controller('shifts')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class ShiftsController {
   constructor(private readonly shiftsService: ShiftsService) {}
 
-  // Create a new shift
+  // Only commander can create shifts
   @Post()
+  @Roles('commander')
   create(@Body() createShiftDto: CreateShiftDto) {
     return this.shiftsService.create(createShiftDto);
   }
 
-  // Get all shifts
+  // Only commander can view all shifts
   @Get()
+  @Roles('commander')
   findAll() {
     return this.shiftsService.findAll();
   }
 
-  // Get a specific shift by ID
+  // Soldier can view only their shift. Commander can view all
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shiftsService.findOne(+id);
+  findOne(@Param('id') id: string, @Request() req) {
+    return this.shiftsService.findOne(+id, req.user);
   }
 }
