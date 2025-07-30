@@ -11,20 +11,7 @@ export type User = {
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
-    {
-      id: 1,
-      username: 'bar',
-      password: '12',
-      role: 'commander',
-    },
-    {
-      id: 2,
-      username: 'avi',
-      password: 'ab',
-      role: 'soldier',
-    },
-  ];
+  private users: User[] = [];
   
   // Finds a user by their username
   findByUsername(username: string): User | undefined {
