@@ -8,11 +8,13 @@ export class AuthController {
     constructor(private readonly authService: AuthService){
     }
     
+    // Handles user registration
     @Post('register')
     register(@Body() body: RegisterDto){
         return this.authService.register(body);
     }
 
+    // Handles user login and returns JWT
     @Post('login')
     login(@Body() body: LoginDto){
         return this.authService.login(body)

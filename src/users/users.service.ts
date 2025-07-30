@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RegisterDto } from '../auth/dto/register.dto';
 
+// Represents a user in memory
 export type User = {
   id: number;
   username: string;
@@ -24,12 +25,14 @@ export class UsersService {
       role: 'soldier',
     },
   ];
-
+  
+  // Finds a user by their username
   findByUsername(username: string): User | undefined {
     return this.users.find((user) => user.username === username);
   }
 
- addUser(dto: RegisterDto) {
+  // Adds a new user to the array
+  create(dto: RegisterDto) {
     const newUser = {
         id: this.users.length + 1,
         username: dto.username,
@@ -40,7 +43,14 @@ export class UsersService {
     this.users.push(newUser);
     return newUser;
   }
-    getAllUsers(): User[] {
+
+  // Returns all users 
+  findAll(): User[] {
      return this.users;
+  }
+
+  // Finds a user by their ID
+  findById(id: number): User | undefined {
+    return this.users.find((user) => user.id === id);
   }
 }

@@ -21,7 +21,7 @@ export class AuthService {
 
     const hashedPassword = await hash(registerDto.password, 10);
 
-    const newUser = this.usersService.addUser({
+    const newUser = this.usersService.create({
       ...registerDto,
       password: hashedPassword,
     });
