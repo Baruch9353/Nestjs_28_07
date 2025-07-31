@@ -41,7 +41,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = this.generateToken(user);
+    const token = await this.generateToken(user);
 
     return {
       access_token: token,
@@ -49,13 +49,13 @@ export class AuthService {
   }
 
   // Generates a JWT token for the authenticated user
-  private generateToken(user: User): string {
+  private async generateToken(user: User): Promise<string> {
     const payload = {
       sub: user.id,
       username: user.username,
       role: user.role,
     };
 
-    return this.jwtService.sign(payload);
+    return await this.jwtService.signAsync(payload);
   }
 }
